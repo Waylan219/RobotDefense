@@ -26,7 +26,7 @@ import jig.misc.rd.RobotDefense;
  *      - actions are based only on the cells immediately adjacent to a tower
  *      - action values are not dependent (at all) on the resulting state 
  */
-public class LearnerOne extends BaseLearningAgent {
+public class BigBrainersAgent extends BaseLearningAgent {
 
 	/**
 	 * A Map of states to actions
