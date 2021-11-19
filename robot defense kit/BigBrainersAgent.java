@@ -69,7 +69,7 @@ public class BigBrainersAgent extends BaseLearningAgent {
 
 	}
 	
-	public LearnerOne() {
+	public BigBrainersAgent() {
 		captureCount = new HashMap<AirCurrentGenerator,Integer>();
 		lastAction = new HashMap<AirCurrentGenerator,AgentAction>();		
 	}

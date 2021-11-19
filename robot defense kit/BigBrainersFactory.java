@@ -7,7 +7,7 @@ import jig.misc.rd.ai.RobotDefenseAgent;
 public class BigBrainersFactory implements AgentFactory {
 
 	public RobotDefenseAgent createAgent(String name, String agentResource) {
-		return new LearnerOne();
+		return new BigBrainersAgent();
 	}
 
 }
