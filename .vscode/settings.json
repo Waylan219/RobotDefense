@@ -1,0 +1,6 @@
+{
+    "java.project.referencedLibraries": [
+        "lib/**/*.jar",
+        "robot defense kit\\rd881.jar"
+    ]
+}
