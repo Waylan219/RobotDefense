@@ -26,7 +26,7 @@ import jig.misc.rd.RobotDefense;
  *      - actions are based only on the cells immediately adjacent to a tower
  *      - action values are not dependent (at all) on the resulting state 
  */
-public class BigBrainersAgent extends BaseLearningAgent {
+public class LearnerOne extends BaseLearningAgent {
 
 	/**
 	 * A Map of states to actions
@@ -55,7 +55,6 @@ public class BigBrainersAgent extends BaseLearningAgent {
 	 */
 	private static final AgentAction [] potentials;
 
-
 	static {
 		Direction [] dirs = Direction.values();
 		potentials = new AgentAction[dirs.length];
@@ -67,9 +66,10 @@ public class BigBrainersAgent extends BaseLearningAgent {
 			potentials[i] = new AgentAction(AirCurrentGenerator.POWER_SETTINGS, d);
 			i++;
 		}
+
 	}
 	
-	public BigBrainersAgent() {
+	public LearnerOne() {
 		captureCount = new HashMap<AirCurrentGenerator,Integer>();
 		lastAction = new HashMap<AirCurrentGenerator,AgentAction>();		
 	}
@@ -90,13 +90,11 @@ public class BigBrainersAgent extends BaseLearningAgent {
 		// This must be called each step so that the performance log is 
 		// updated.
 		updatePerformanceLog();
-
-		
 		
 		for (AirCurrentGenerator acg : sensors.generators.keySet()) {
 			if (!stateChanged(acg)) continue;
 
-			
+
 			// Check the current state, and make sure member variables are
 			// initialized for this particular state...
 			state = thisState.get(acg);
