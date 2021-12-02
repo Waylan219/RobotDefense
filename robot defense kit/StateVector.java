@@ -27,7 +27,7 @@ public class StateVector {
 	 * adjacent to the tower are taken into account.  A larger radius means
 	 * more cells are taken into account, but also increases the state space.
 	 */
-	static final int RADIUS = 1;
+	static final int RADIUS = 2;
 	
 	/**
 	 * Member variables with the 'ns' prefix are NOT actually part of the state

@@ -13,7 +13,6 @@ import jig.misc.rd.AirCurrentGenerator;
 import jig.misc.rd.Direction;
 import jig.misc.rd.RobotDefense;
 
-
 /**
  *  A simple agent that uses reinforcement learning to direct the vacuum
  *  The agent has the following critical limitations:
@@ -27,6 +26,8 @@ import jig.misc.rd.RobotDefense;
  *      - action values are not dependent (at all) on the resulting state 
  */
 public class BigBrainersAgent extends BaseLearningAgent {
+
+	int stateCounter = 0;
 
 	/**
 	 * A Map of states to actions
@@ -58,14 +59,21 @@ public class BigBrainersAgent extends BaseLearningAgent {
 
 	static {
 		Direction [] dirs = Direction.values();
-		potentials = new AgentAction[dirs.length];
+		potentials = new AgentAction[(dirs.length*2)+1];
+
 
 		int i = 0;
-		for(Direction d: dirs) {
+		int power = 1;
+		
+		for(Direction d: dirs){
 			// creates a new directional action with the power set to full
 			// power can range from 1 ... AirCurrentGenerator.POWER_SETTINGS
-			potentials[i] = new AgentAction(AirCurrentGenerator.POWER_SETTINGS, d);
-			i++;
+			for(int j = 2; j < 5 ; j += 2){
+				potentials[i] = new AgentAction(j, d);
+				System.out.println(potentials[i]);
+				i++;
+			}
+			potentials[i] = new AgentAction(0,dirs[0]);
 		}
 	}
 	
@@ -91,10 +99,18 @@ public class BigBrainersAgent extends BaseLearningAgent {
 		// updated.
 		updatePerformanceLog();
 
-		
-		
 		for (AirCurrentGenerator acg : sensors.generators.keySet()) {
-			if (!stateChanged(acg)) continue;
+		
+			if(stateCounter < 6)
+			{
+				if (!stateChanged(acg))
+				{
+					stateCounter++;
+					continue;
+				}
+			}
+
+			stateCounter = 0;
 
 			
 			// Check the current state, and make sure member variables are
@@ -111,6 +127,7 @@ public class BigBrainersAgent extends BaseLearningAgent {
 			// most up-to-date value from the sensors
 			boolean justCaptured;
 			justCaptured = (captureCount.get(acg) < sensors.generators.get(acg));
+			
 
 			// if this ACG has been selected by the user, we'll do some verbose printing
 			boolean verbose = (RobotDefense.getGame().getSelectedObject() == acg);
@@ -134,6 +151,8 @@ public class BigBrainersAgent extends BaseLearningAgent {
 				}
 			} 
 
+			
+
 			// decide what to do now...
 			// first, get the action map associated with the current state
 			qmap = actions.get(state);
@@ -148,7 +167,7 @@ public class BigBrainersAgent extends BaseLearningAgent {
 
 			// finally, store our action so we can reward it later.
 			lastAction.put(acg, bestAction);
-
+		
 		}
 	}
 
