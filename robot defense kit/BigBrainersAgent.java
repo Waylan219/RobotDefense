@@ -185,7 +185,7 @@ public class BigBrainersAgent extends BaseLearningAgent {
 			// If radius is empty turn off sucker
 			if(thisState.get(acg).getEmptyRadius() == true)
 			{
-				System.out.println("Hello this is a print statement to see if it works. ");
+				//System.out.println("Hello this is a print statement to see if it works. ");
 				//lastAction.put(acg, potentials[potentials.length-1]);
 				//bestAction.doAction(acg);
 				bestAction = potentials[potentials.length-1];

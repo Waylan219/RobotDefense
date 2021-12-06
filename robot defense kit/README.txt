@@ -22,9 +22,9 @@
     Base Learners performance
     366376	38	17	112
 
-    I feel as if we would have been able to let our agent to run longer it would out
-    performan the base learner by even more than what it would have. It would have
-    learned mroe of when to turn the vacuum off to save resources and therefore run
+    We feel as if we would have been able to let our agent to run longer our agent would out
+    perform the base learner by even more than what our agent would have. Our agent would have
+    learned more of when to turn the vacuum off to save resources and therefore run
     for even longer than the base agent. The base learner would still be using max
     resources non stop and would not perform as well as ours would.
 
@@ -85,20 +85,80 @@
     793808	33	119	186
  
 2 B.
-    Updated by rewarding current state when last state caught a bug. Results were nice
+    We approached this by looked at how the states are stored in the step function. We can see
+    that is uses lastState first and rewards that state, it then sets lastState to the current state
+    afterwards. We can then use that to reward the current state that is stored in the lastState
+    before it loops again. Therefore we reward our lastState normally as it caught a bug, and if 
+    lastState caught a bug we reward the current state aswell but not nearly as heavily. lastState 
+    gets rewarded 20 while thisState gets rewarded 5. 
     
+    Our results after implementing this :
     752055	19	150	169
 
 3 A.
-    We rewarded related states directions with the same power the reward value / 4. 
-    For example if a bug was caught in east it would get rewarded with that same power
-    in southeast and northeast for that value / 4. 
+    We thought of ways to reward related actions to our current action. If a bug was caught on
+    power 4 and it was pointing North , we wanted to reward the directions similar to North ; which
+    would be North-East and North-West. The way we approached this is be looking at how the actions
+    are being stored when we reward them, which is in an array of size 16. We then printed out the array
+    to see how they are being stored and realized there was a pattern based off our initial for loop. To 
+    be able to get the related state you would have to increment by 2 and decrement by 2. We then tried this
+    and got a null pointer error because if the action was stored in position 1 it would try to access
+    and action stored in [-1]; which doesn't exist. We then made two if statements to loop back around
+    our array so that if the action stored in 0 was called it would reward action at position 2 and
+    position 14; which would be the two actions related to our action that we are rewarding. However
+    we did not want to reward these actions the same value as the action that caught the bug so we
+    rewarded it the normal value / 4, which would be 5. Which is the same value as our current action
+    reward implemented from the last step. 
 
 3 B.
-    We added a class to get a emptyradius boolean variable and if that was true 
-    then we would shut off power to be able to save resources.
+    When we get access to change StateVector and CellContent we first thought of how we can return
+    when there is nothing in the radius; which is the only time it determines when to take an 
+    action based on knowledge. We then created a new public boolean variable called EmptyRadius
+    and it would add all of the bugs code together and if that was 0 then that means there is 
+    nothing currently in the radius for it to make a knowledge based decision. Therefore we set
+    this boolean in the current StateVector to true. We then create a GetEmptyRadius which returns
+    this boolean for each state and then we can flip the switch on the vacuum to save resources.
+    We also approached this by looking at the insects but that approach did not work for us and 
+    decided to keep the approach we had. After this we also turned the radius back up to 2; but 
+    that proved less results; which makes sense since it mainly catches bugs when they are beside 
+    the vacuum. The reason behind that is because it triggers double the amount of state changes
+    and therefore would make more actions. 
 
-    Run tests with and without!
+    With our agent :
+
+    1173011	1	229	232
+
+    Base agent :
+    507676	100	107	105
+
+    As you can see it runs for 665,335 more; which is over double what the base agents run time is!
+    The reason being is because it does not go at full throttle and now really implies and saving
+    resources by switching it to 0 if the radius is empty. 
+
+    We also tried changing the bugs values to see how that woud impact our results.
+
+    Bugs all valued at 10:
+    1066532	47	185	226
+
+    As you can see it did worse, which expectedly so since it applies the same ruling to each
+    bug even though they prefer different power levels. 
+
+    We also added to our representation function a Power Off string to represent when the 
+    vacuum is being powered off because the radius is empty. 
+    
+
+
+    Can be easily ran if you have make installed by running these commands in order :
+
+    make
+
+    make run
+
+    or for the shorter option : 
+
+    make runshort
+
+
 
 
 

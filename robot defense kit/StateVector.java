@@ -155,8 +155,6 @@ public class StateVector {
 		else
 		{
 			s.EmptyRadius = false;
-			
-			System.out.println("GETTING IN HERE");
 		}
 		
 		return s;
@@ -197,7 +195,12 @@ public class StateVector {
 		sb.append(hashCode);
 		sb.append(" Tower: ");
 		sb.append(towerType.toString());
+		if(EmptyRadius == true)
+		{
+			sb.append(" - Powered Off");
+		}
 		sb.append("\nCells:\n");
+		
 		int i = 0;
 		// TOP
 		for (int y = 0; y < RADIUS; y++) {
@@ -227,6 +230,8 @@ public class StateVector {
 			}
 			sb.append('\n');
 		}
+
+	
 		
 		return sb.toString();
 	}
