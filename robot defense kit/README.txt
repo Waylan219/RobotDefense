@@ -1,3 +1,11 @@
+Project Robot Defense
+CSC 4240 - 001
+
+Jonathan Spradlin
+Waylan Garton
+Bryan Davis
+Peyton Nelson
+
 1 A. 
     We looked throught the files to see where the actions are being created. We found
     out that the actions were being created with 8 different directions and 1 power
