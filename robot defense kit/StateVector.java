@@ -27,7 +27,7 @@ public class StateVector {
 	 * adjacent to the tower are taken into account.  A larger radius means
 	 * more cells are taken into account, but also increases the state space.
 	 */
-	static final int RADIUS = 2;
+	static final int RADIUS = 1;
 	
 	/**
 	 * Member variables with the 'ns' prefix are NOT actually part of the state
@@ -55,6 +55,10 @@ public class StateVector {
 	private int hashCode;
 
 	private static StateVector emptyState;
+
+	//ADDED
+	public boolean EmptyRadius;
+
 	
 	private StateVector() {}
 	
@@ -64,6 +68,7 @@ public class StateVector {
 			emptyState.cellContentsCode = new int[0];
 			emptyState.hashCode = 0;
 			emptyState.towerType = FanTower.class;
+			emptyState.EmptyRadius = true;
 		}
 		return emptyState;
 		
@@ -99,6 +104,9 @@ public class StateVector {
 		int acg_x = acg.getGridX();
 		int i = 0;
 		int code;
+
+		int empty = 0;
+
 		// TOP Part (North of Tower)
 		for (int y = acg_y - RADIUS; y < acg_y; y++) {
 			for(int x = acg_x - RADIUS, xe = acg_x+RADIUS+acg.getGridWidth(); x < xe; x++) {
@@ -106,7 +114,8 @@ public class StateVector {
 				//System.out.println("Code for " + x + "," + y + "is " + code);
 				s.cellContentsCode[i++] = code;
 				s.hashCode += code;
-				
+				//ADDED
+				empty += code;
 			}
 		}		
 		// LEFT & RIGHT Parts (East and West of Tower)
@@ -115,11 +124,15 @@ public class StateVector {
 				code = sensors.getMapContentsCode(x,y);
 				s.cellContentsCode[i++] = code;
 				s.hashCode += code;
+				//ADDED
+				empty += code;
 			}
 			for(int x = acg_x + acg.getGridWidth(), xe = acg_x + acg.getGridWidth() + RADIUS; x < xe; x++) {
 				code = sensors.getMapContentsCode(x,y);
 				s.cellContentsCode[i++] = code;
 				s.hashCode += code;
+				//ADDED
+				empty += code;
 			}
 
 		}
@@ -129,7 +142,21 @@ public class StateVector {
 				code = sensors.getMapContentsCode(x,y);
 				s.cellContentsCode[i++] = code;
 				s.hashCode += code;
+				//ADDED
+				empty += code;
 			}
+		}
+
+		//ADDED
+		if(empty == 0)
+		{
+			s.EmptyRadius = true;
+		}
+		else
+		{
+			s.EmptyRadius = false;
+			
+			System.out.println("GETTING IN HERE");
 		}
 		
 		return s;
@@ -203,6 +230,12 @@ public class StateVector {
 		
 		return sb.toString();
 	}
+
+	public boolean getEmptyRadius()
+	{
+		return EmptyRadius;
+	}
+
 	
 }
 
@@ -255,6 +288,14 @@ class CellContents {
 	public void removeInsect(InsectView i) {
 		insects.remove(i);
 	}
+
+	/*public static boolean checkInsects()
+	{
+		if(insects.element() == null)
+		{
+			return true;
+		}
+	}*/
 	
 	/**
 	 * Called by the Agent's Sensory Interface when an air current generator 
@@ -310,9 +351,9 @@ class CellContents {
 		String sn;
 		for (InsectView iv : insects) {
 			sn = iv.shortName();
-			if (sn.equals("scarabug")) code += 1;
+			if (sn.equals("scarabug")) code += 100;
 			else if (sn.equals("scarlite")) code += 10;
-			else if (sn.equals("sqworm")) code += 100;
+			else if (sn.equals("sqworm")) code += 1;
 			else {
 				System.err.println("Unknown insect type: " + sn);
 				code += 7;

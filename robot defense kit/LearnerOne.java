@@ -94,7 +94,7 @@ public class LearnerOne extends BaseLearningAgent {
 		for (AirCurrentGenerator acg : sensors.generators.keySet()) {
 			if (!stateChanged(acg)) continue;
 
-
+			
 			// Check the current state, and make sure member variables are
 			// initialized for this particular state...
 			state = thisState.get(acg);

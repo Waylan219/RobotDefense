@@ -70,7 +70,8 @@ public class BigBrainersAgent extends BaseLearningAgent {
 			// power can range from 1 ... AirCurrentGenerator.POWER_SETTINGS
 			for(int j = 2; j < 5 ; j += 2){
 				potentials[i] = new AgentAction(j, d);
-				System.out.println(potentials[i]);
+				//System.out.println()
+				//System.out.println(i + ":" + potentials[i].getDirection() + potentials[i].getPower());
 				i++;
 			}
 			potentials[i] = new AgentAction(0,dirs[0]);
@@ -100,7 +101,12 @@ public class BigBrainersAgent extends BaseLearningAgent {
 		updatePerformanceLog();
 
 		for (AirCurrentGenerator acg : sensors.generators.keySet()) {
-		
+
+			//System.out.println(getMapContentsCode());
+			
+
+			boolean captured = false;
+
 			if(stateCounter < 6)
 			{
 				if (!stateChanged(acg))
@@ -109,6 +115,12 @@ public class BigBrainersAgent extends BaseLearningAgent {
 					continue;
 				}
 			}
+
+			
+			
+			//CellContents.checkInsects();
+
+			//System.out.println(getSensorySystem());
 
 			stateCounter = 0;
 
@@ -131,17 +143,27 @@ public class BigBrainersAgent extends BaseLearningAgent {
 
 			// if this ACG has been selected by the user, we'll do some verbose printing
 			boolean verbose = (RobotDefense.getGame().getSelectedObject() == acg);
+			//System.out.println(verbose);
 
 			// If we did something on the last 'turn', we need to reward it
-			if (lastAction.get(acg) != null ) {
+			if (lastAction.get(acg) != null ) 
+			{
 
 				// get the action map associated with the previous state
 				qmap = actions.get(lastState.get(acg));
+				//System.out.println(actions.get(lastState.get(acg)));
+				
+				//System.out.println(lastAction.get(acg).getDirection());
+				//lastAction.get(acg).getDirection());
+				//lastAction.get(acg).getPower());
+
+				
 
 				if (justCaptured) {
 					// capturing insects is good
-					qmap.rewardAction(lastAction.get(acg), 10.0);
+					qmap.rewardAction(lastAction.get(acg), 20.0);
 					captureCount.put(acg,sensors.generators.get(acg));
+					captured = true;
 				}
 
 				if (verbose) {
@@ -149,26 +171,44 @@ public class BigBrainersAgent extends BaseLearningAgent {
 					System.out.println(lastState.get(acg).representation());
 					System.out.println("Updated Last Action: " + qmap.getQRepresentation());
 				}
-			} 
-
-			
-
+			}
+		
 			// decide what to do now...
 			// first, get the action map associated with the current state
 			qmap = actions.get(state);
+			AgentAction bestAction;
 
 			if (verbose) {
 				System.out.println("This State for Tower " + acg.toString() );
 				System.out.println(thisState.get(acg).representation());
 			}
-			// find the 'right' thing to do, and do it.
-			AgentAction bestAction = qmap.findBestAction(verbose);
-			bestAction.doAction(acg);
+			// If radius is empty turn off sucker
+			if(thisState.get(acg).getEmptyRadius() == true)
+			{
+				System.out.println("Hello this is a print statement to see if it works. ");
+				//lastAction.put(acg, potentials[potentials.length-1]);
+				//bestAction.doAction(acg);
+				bestAction = potentials[potentials.length-1];
+				bestAction.doAction(acg);
+			}
+			else{
+				// find the 'right' thing to do, and do it.
+				bestAction = qmap.findBestAction(lastAction.get(acg),verbose);
+				bestAction.doAction(acg);
+				//System.out.println(bestAction);
+			}
 
 			// finally, store our action so we can reward it later.
 			lastAction.put(acg, bestAction);
-		
+
+			//reward the current action if a bug was caught from last action
+			if(captured == true)
+			{
+				//this is current action
+				qmap.rewardAction(lastAction.get(acg), 5.0);
+			}
 		}
+			
 	}
 
 
@@ -201,10 +241,11 @@ public class BigBrainersAgent extends BaseLearningAgent {
 		 * @param verbose
 		 * @return
 		 */
-		public AgentAction findBestAction(boolean verbose) {
+		public AgentAction findBestAction( AgentAction lastAction, boolean verbose) {
 			int i,maxi,maxcount;
 			maxi=0;
 			maxcount = 1;
+			int test;
 			
 			if (verbose)
 				System.out.print("Picking Best Actions: " + getQRepresentation());
@@ -226,6 +267,10 @@ public class BigBrainersAgent extends BaseLearningAgent {
 
 				for (i = 0; i < utility.length; i++) {
 					if (utility[i] == utility[maxi]) {
+						if(lastAction == actions[i])
+						{
+							return lastAction;
+						}
 						if (whichMax == 0) return actions[i];
 						whichMax--;
 					}
@@ -249,17 +294,51 @@ public class BigBrainersAgent extends BaseLearningAgent {
 		 */
 		public void rewardAction(AgentAction a, double value) {
 			int i;
+			
+
+			//if(a.getDirection() == "south")
 			for (i = 0; i < actions.length; i++) {
-				if (a == actions[i]) break;
+				if (a == actions[i]){
+					//System.out.println("Action " + actions[i+1].getDirection() + actions[i+1].getPower());
+					break;
+				}
 			}
 			if (i >= actions.length) {
 				System.err.println("ERROR: Tried to reward an action that doesn't exist in the QMap. (Ignoring reward)");
 				return;
 			}
 
+			int sideAction1 = i-2;
+			int sideAction2 = i+2;
+
+			if(i <= 1)
+			{
+				sideAction1 = sideAction1 + 16;
+			}
+			if(i >= 15)
+			{
+				sideAction2 = sideAction2 - 16;
+			}
+
+			
+			//action behind
+			utility[sideAction1] = (utility[sideAction1] * attempts[sideAction1]) + value/2;
+			attempts[sideAction1] = attempts[sideAction1] + 1;
+			utility[sideAction1] = utility[sideAction1]/attempts[sideAction1];
+			//System.out.println("Behind Action " + actions[sideAction1].getDirection() + actions[sideAction1].getPower());
+			
+			//main action
 			utility[i] = (utility[i] * attempts[i]) + value;
 			attempts[i] = attempts[i] + 1;
 			utility[i] = utility[i]/attempts[i];
+			//System.out.println("Main Action " + actions[i].getDirection() + actions[i].getPower());
+
+			//action ahead
+			utility[sideAction2] = (utility[sideAction2] * attempts[sideAction2]) + value/2;
+			attempts[sideAction2] = attempts[sideAction2] + 1;
+			utility[sideAction2] = utility[sideAction2]/attempts[sideAction2];
+			//System.out.println("Ahead Action " + actions[sideAction2].getDirection() + actions[sideAction2].getPower());
+			//System.out.println(utility[i]);
 		}
 		/**
 		 * Gets a string representation (for debugging).

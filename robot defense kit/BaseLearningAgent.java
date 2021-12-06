@@ -199,6 +199,7 @@ class LearningAgentSensorSystem implements AgentSensoryInterface {
 	public int getMapContentsCode(int gx, int gy) {
 		try {
 			int r = map[gx][gy].getContentsCode();
+			//System.out.println("X : " +gx+"y : " +gy+"R : " +r);
 			return r;
 		} catch (ArrayIndexOutOfBoundsException aob) {
 			return CellContents.getOutOfBoundsContentsCode();
